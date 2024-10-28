@@ -43,6 +43,7 @@ class LidlPlusApi:
     _COUPONS_API = "https://coupons.lidlplus.com/api"
     _COUPONS_V1_API = "https://coupons.lidlplus.com/app/api/"
     _PROFILE_API = "https://profile.lidlplus.com/profile/api"
+    _STORES_API = "https://stores.lidlplus.com/api"
     _APP = "com.lidlplus.app"
     _OS = "iOs"
     _TIMEOUT = 10
@@ -308,3 +309,21 @@ class LidlPlusApi:
         response = requests.get(url, **kwargs)
         response.raise_for_status()
         return response.text
+
+    def set_favourite_store(self, store_id):
+        url = f"{self._STORES_API}/v1/users/me/favorite/{self._country}"
+        payload = {
+            "country": self._country,
+            "storeKey": store_id,
+        }
+        kwargs = {"headers": self._default_headers(), "json": payload, "timeout": self._TIMEOUT}
+        requests.put(url, **kwargs)
+
+        url = f"{self._PROFILE_API}/v1/updateCountryInfo"
+        payload = {
+            "country_code": self._country,
+            "language": self._language,
+            "store_id": store_id,
+        }
+        kwargs = {"headers": self._default_headers(), "json": payload, "timeout": self._TIMEOUT}
+        requests.post(url, **kwargs)
